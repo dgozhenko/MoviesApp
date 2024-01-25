@@ -1,6 +1,5 @@
 import 'package:get_it/get_it.dart';
 import 'package:movies_app/config/database/app_database.dart';
-import 'package:movies_app/data/datasource/sqlite_movie_list_data_source.dart';
 import 'package:movies_app/data/repository/sqlite_movie_repository.dart';
 import 'package:movies_app/domain/dao/movie_dao.dart';
 
@@ -21,10 +20,5 @@ Future<void> setup() async {
   getIt.registerSingletonWithDependencies(
     () => SQLiteMovieRepository(),
     dependsOn: [AppDatabase, MovieDao],
-  );
-
-  getIt.registerSingletonWithDependencies(
-    () => SQLiteMovieListDataSource(),
-    dependsOn: [SQLiteMovieRepository],
   );
 }
