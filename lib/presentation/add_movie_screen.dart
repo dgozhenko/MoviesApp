@@ -29,37 +29,62 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AddMovieCubit, AddMovieState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is ErrorAddMovieState) {
+          final snackBar = SnackBar(
+            content: Text(state.errorMessage),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
+
+        if (state is AddMovieNavigateBackAction) {
+          Navigator.pop(context);
+        }
+      },
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Add a movie'),
         ),
-        body: Column(
-          children: [
-            const SizedBox(
-              height: 24,
-            ),
-            TextField(
-              controller: _movieTitleEditingController,
-              decoration: const InputDecoration(border: OutlineInputBorder()),
-            ),
-            BlocBuilder<AddMovieCubit, AddMovieState>(
-              builder: (context, state) {
-                return ElevatedButton(onPressed: () {
-                  context
-                      .read<AddMovieCubit>()
-                      .addMovie(title: _movieTitleEditingController.text);
-                }, child: Builder(builder: (context) {
-                  if (state is AddMovieInsertLoadingState) {
-                    return CircularProgressIndicator();
-                  } else if (state is ErrorAddMovieState) {
-                    return Text(state.errorMessage);
-                  }
-                  return Text('Create');
-                }));
-              },
-            )
-          ],
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 24,
+              ),
+              TextField(
+                controller: _movieTitleEditingController,
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+              ),
+              const SizedBox(
+                height: 24,
+              ),
+              BlocBuilder<AddMovieCubit, AddMovieState>(
+                builder: (context, state) {
+                  return SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                        onPressed: (state is AddMovieInsertLoadingState)
+                            ? null
+                            : () {
+                                context.read<AddMovieCubit>().addMovie(
+                                    title: _movieTitleEditingController.text);
+                              },
+                        child: Builder(builder: (context) {
+                          if (state is AddMovieInsertLoadingState) {
+                            return const Center(
+                                child: SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child: CircularProgressIndicator()));
+                          }
+                          return const Text('Create');
+                        })),
+                  );
+                },
+              )
+            ],
+          ),
         ),
       ),
     );

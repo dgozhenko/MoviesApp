@@ -6,6 +6,7 @@ class MovieDao {
 
   Future<int> createMovie(Movie movie) async {
     final database = await databaseProvider.database;
+    await Future.delayed(Duration(seconds: 2));
     var results = database.insert(movieTable, movie.toDatabaseJson());
     return results;
   }
