@@ -1,16 +1,8 @@
-import 'package:floor/floor.dart';
-
-@Entity(tableName: 'movie')
 class Movie {
-  @PrimaryKey(autoGenerate: true)
   int? id;
-  @ColumnInfo(name: 'title')
   String title;
-  @ColumnInfo(name: 'image_url')
   String? imageUrl;
-  @ColumnInfo(name: 'creation_time')
-  DateTime creationTime;
-  @ColumnInfo(name: 'is_watched')
+  int creationTime;
   bool isWatched;
 
   Movie({
@@ -20,6 +12,22 @@ class Movie {
     required this.creationTime,
     required this.isWatched,
   });
+
+  factory Movie.fromDatabaseJson(Map<String, dynamic> data) => Movie(
+        id: data['id'],
+        title: data['title'],
+        creationTime: data['creation_time'],
+        isWatched: data['is_watched'] == 0 ? false : true,
+        imageUrl: data['image_url'],
+      );
+
+  Map<String, dynamic> toDatabaseJson() => {
+        'id': id,
+        'title': title,
+        'creation_time': creationTime,
+        'is_watched': isWatched == false ? 0 : 1,
+        'image_url': imageUrl
+      };
 
   Movie copyWith({int? id, String? title, String? imageUrl, bool? isWatched}) {
     return Movie(

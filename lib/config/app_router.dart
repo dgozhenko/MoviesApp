@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movies_app/presentation/add_movie_screen.dart';
 import 'package:movies_app/presentation/movie_list_screen.dart';
 
 class AppRouter {
@@ -8,6 +9,8 @@ class AppRouter {
         return MovieListScreen.route();
       case MovieListScreen.routeName:
         return MovieListScreen.route();
+      case AddMovieScreen.routeName:
+        return AddMovieScreen.route();
       default:
         return _errorRoute();
     }
@@ -15,7 +18,11 @@ class AppRouter {
 
   static Route _errorRoute() {
     return MaterialPageRoute(
-        builder: (_) => const Scaffold(),
+        builder: (_) => const Scaffold(
+              body: Center(
+                child: Text('Navigaqtion Error'),
+              ),
+            ),
         settings: const RouteSettings(name: '/error'));
   }
 }

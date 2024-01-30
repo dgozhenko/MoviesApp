@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/data/cubit/movie_list_cubit.dart';
 import 'package:movies_app/domain/state/movie_list_state.dart';
+import 'package:movies_app/presentation/add_movie_screen.dart';
 
 class MovieListScreen extends StatelessWidget {
   const MovieListScreen({super.key});
@@ -17,6 +18,12 @@ class MovieListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, AddMovieScreen.routeName);
+        },
+        child: const Icon(Icons.add),
+      ),
       appBar: AppBar(
         title: const Text('Movies'),
       ),
@@ -44,8 +51,7 @@ class MovieListScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(movies[index].title),
-                    subtitle:
-                        Text(movies[index].creationTime.toIso8601String()),
+                    subtitle: Text(movies[index].creationTime.toString()),
                   );
                 },
               );

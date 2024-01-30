@@ -3,6 +3,16 @@ import 'package:movies_app/domain/entity/movie_entity.dart';
 
 abstract class MovieListState extends Equatable {}
 
+abstract class MovieListActionState extends MovieListState {}
+
+class MovieListNavigateToAddMovieScreenAction extends MovieListActionState {
+  final String? movieId;
+  MovieListNavigateToAddMovieScreenAction({this.movieId});
+
+  @override
+  List<Object?> get props => [movieId];
+}
+
 class InitialState extends MovieListState {
   @override
   List<Object?> get props => [];
