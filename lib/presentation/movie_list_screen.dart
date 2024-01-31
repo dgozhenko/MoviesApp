@@ -4,7 +4,7 @@ import 'package:movies_app/data/cubit/movie_list_cubit.dart';
 import 'package:movies_app/domain/state/movie_list_state.dart';
 import 'package:movies_app/presentation/add_movie_screen.dart';
 
-class MovieListScreen extends StatelessWidget {
+class MovieListScreen extends StatefulWidget {
   const MovieListScreen({super.key});
 
   static const routeName = '/movie-list-screen';
@@ -16,11 +16,18 @@ class MovieListScreen extends StatelessWidget {
   }
 
   @override
+  State<MovieListScreen> createState() => _MovieListScreenState();
+}
+
+class _MovieListScreenState extends State<MovieListScreen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, AddMovieScreen.routeName);
+          Navigator.pushNamed(context, AddMovieScreen.routeName).then(
+            (value) => context.read<MovieListCubit>().observeAllMovies(),
+          );
         },
         child: const Icon(Icons.add),
       ),
