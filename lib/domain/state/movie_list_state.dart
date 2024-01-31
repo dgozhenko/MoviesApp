@@ -38,3 +38,10 @@ class ErrorState extends MovieListState {
   @override
   List<Object?> get props => [errorMessage];
 }
+
+class MovieListLoadedStateDeleteSuccess extends LoadedState {
+  final Movie deletedMovie;
+  MovieListLoadedStateDeleteSuccess(super.movies, {required this.deletedMovie});
+  @override
+  List<Object?> get props => [movies, deletedMovie];
+}

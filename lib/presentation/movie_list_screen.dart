@@ -34,39 +34,63 @@ class _MovieListScreenState extends State<MovieListScreen> {
       appBar: AppBar(
         title: const Text('Movies'),
       ),
-      body: BlocBuilder<MovieListCubit, MovieListState>(
-        builder: (context, state) {
-          if (state is LoadingState) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (state is ErrorState) {
-            return Center(
-              child: Text(state.errorMessage),
-            );
-          }
-
-          if (state is LoadedState) {
-            final movies = state.movies;
-            if (movies.isEmpty) {
-              return Center(child: Text('There no data...'));
-            } else {
-              return ListView.builder(
-                itemCount: movies.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(movies[index].title),
-                    subtitle: Text(movies[index].creationTime.toString()),
-                  );
-                },
-              );
-            }
-          } else {
-            return Container();
+      body: BlocListener<MovieListCubit, MovieListState>(
+        listener: (context, state) {
+          if (state is MovieListLoadedStateDeleteSuccess) {
+            final deleteSuccessSnackbar = SnackBar(
+                content: Text('Deleted movie: ${state.deletedMovie.title}'));
+            ScaffoldMessenger.of(context).showSnackBar(deleteSuccessSnackbar);
           }
         },
+        child: BlocBuilder<MovieListCubit, MovieListState>(
+          builder: (context, state) {
+            if (state is LoadingState) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            if (state is ErrorState) {
+              return Center(
+                child: Text(state.errorMessage),
+              );
+            }
+
+            if (state is LoadedState) {
+              final movies = state.movies;
+              if (movies.isEmpty) {
+                return const Center(child: Text('There no data...'));
+              } else {
+                return ListView.builder(
+                  itemCount: movies.length,
+                  itemBuilder: (context, index) {
+                    return Dismissible(
+                      key: Key(movies[index].id.toString()),
+                      onDismissed: (direction) {
+                        context
+                            .read<MovieListCubit>()
+                            .deleteMovie(movies[index]);
+                      },
+                      background: Container(
+                        color: Colors.red,
+                        child: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                      ),
+                      child: ListTile(
+                        title: Text(movies[index].title),
+                        subtitle: Text(movies[index].creationTime.toString()),
+                      ),
+                    );
+                  },
+                );
+              }
+            } else {
+              return Container();
+            }
+          },
+        ),
       ),
     );
   }

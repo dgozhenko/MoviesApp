@@ -14,4 +14,9 @@ class SQLiteMovieRepository extends MovieRepository {
   Future<int> insertMovie(Movie movie) {
     return movieDao.createMovie(movie);
   }
+
+  @override
+  Future<int> deleteMovie(int movieId) {
+    return movieDao.deleteMovie(movieId);
+  }
 }
