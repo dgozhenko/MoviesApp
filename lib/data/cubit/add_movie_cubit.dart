@@ -30,6 +30,17 @@ class AddMovieCubit extends Cubit<AddMovieState> {
     }
   }
 
+  void updateMovie({required Movie movie, required String updatedTitle}) async {
+    final updatedMovie = movie.copyWith(title: updatedTitle);
+    try {
+      emit(AddMovieInsertLoadingState());
+      await repository.updateMovie(updatedMovie);
+      emit(AddMovieNavigateBackAction());
+    } catch (e) {
+      emit(ErrorAddMovieState(errorMessage: e.toString()));
+    }
+  }
+
   void addMovie({required String title}) async {
     final movie = Movie(
         title: title,

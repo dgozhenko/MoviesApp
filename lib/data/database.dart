@@ -33,7 +33,7 @@ class DatabaseProvider {
         "id INTEGER PRIMARY KEY, "
         "title TEXT, "
         "is_watched INTEGER, "
-        "image_url TEXT NULLABLE, "
+        "image_url TEXT, "
         "creation_time INTEGET "
         ")");
   }

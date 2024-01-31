@@ -10,6 +10,13 @@ class MovieDao {
     return results;
   }
 
+  Future<int> updateMovie(Movie movie) async {
+    final database = await databaseProvider.database;
+    var results = database.update(movieTable, movie.toDatabaseJson(),
+        where: 'id = ?', whereArgs: [movie.id]);
+    return results;
+  }
+
   Future<int> deleteMovie(int movieId) async {
     final database = await databaseProvider.database;
     var results =

@@ -8,4 +8,6 @@ abstract class MovieRepository {
   Future<int> deleteMovie(int movieId);
 
   Future<Movie?> getMovieById(int movieId);
+
+  Future<int> updateMovie(Movie movie);
 }

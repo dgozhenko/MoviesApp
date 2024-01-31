@@ -29,8 +29,9 @@ class Movie {
         'image_url': imageUrl
       };
 
-  Movie copyWith({int? id, String? title, String? imageUrl, bool? isWatched}) {
+  Movie copyWith({String? title, String? imageUrl, bool? isWatched}) {
     return Movie(
+      id: id,
       title: title ?? this.title,
       creationTime: creationTime,
       isWatched: isWatched ?? this.isWatched,

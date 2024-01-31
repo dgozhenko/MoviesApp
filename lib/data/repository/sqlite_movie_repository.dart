@@ -24,4 +24,9 @@ class SQLiteMovieRepository extends MovieRepository {
   Future<Movie?> getMovieById(int movieId) {
     return movieDao.getMovieById(movieId: movieId);
   }
+
+  @override
+  Future<int> updateMovie(Movie movie) {
+    return movieDao.updateMovie(movie);
+  }
 }

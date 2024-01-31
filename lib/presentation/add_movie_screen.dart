@@ -83,7 +83,18 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
                                               title:
                                                   _movieTitleEditingController
                                                       .text);
-                                        } else {}
+                                        } else {
+                                          final movie =
+                                              (state as LoadedAddMovieState)
+                                                  .movie;
+                                          context
+                                              .read<AddMovieCubit>()
+                                              .updateMovie(
+                                                  movie: movie!,
+                                                  updatedTitle:
+                                                      _movieTitleEditingController
+                                                          .text);
+                                        }
                                       },
                                 child: Builder(builder: (context) {
                                   if (state is AddMovieInsertLoadingState) {
