@@ -14,9 +14,11 @@ class AddMovieScreen extends StatefulWidget {
 
 class _AddMovieScreenState extends State<AddMovieScreen> {
   final _movieTitleEditingController = TextEditingController();
+  var _titleLength = 0;
 
   @override
   void initState() {
+    _movieTitleEditingController.addListener(_updateTitleLength);
     context.read<AddMovieCubit>().loadMovieScreen(movieId: widget.movieId);
     super.initState();
   }
@@ -25,6 +27,12 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
   void dispose() {
     _movieTitleEditingController.dispose();
     super.dispose();
+  }
+
+  void _updateTitleLength() {
+    setState(() {
+      _titleLength = _movieTitleEditingController.text.length;
+    });
   }
 
   @override
@@ -64,8 +72,12 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
                       ),
                       TextField(
                         controller: _movieTitleEditingController,
-                        decoration:
-                            const InputDecoration(border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          label: const Text('Movie Title'),
+                          counterText: '$_titleLength / 50',
+                        ),
+                        maxLength: 50,
                       ),
                       const SizedBox(
                         height: 24,
