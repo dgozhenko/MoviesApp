@@ -28,4 +28,14 @@ class MovieListCubit extends Cubit<MovieListState> {
       emit(ErrorState(e.toString()));
     }
   }
+
+  void restoreMovie({required Movie movie}) async {
+    try {
+      await repository.insertMovie(movie);
+      final movies = await repository.getMovies();
+      emit(MovieListLoadedStateUndoDeleteSuccess(movies, restoredMovie: movie));
+    } catch (e) {
+      emit(ErrorState(e.toString()));
+    }
+  }
 }

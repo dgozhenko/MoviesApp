@@ -36,8 +36,22 @@ class _MovieListScreenState extends State<MovieListScreen> {
       ),
       body: BlocListener<MovieListCubit, MovieListState>(
         listener: (context, state) {
+          if (state is MovieListLoadedStateUndoDeleteSuccess) {
+            const restoreSuccessSnackbar =
+                SnackBar(content: Text('Successfuly restored movie'));
+            ScaffoldMessenger.of(context).showSnackBar(restoreSuccessSnackbar);
+          }
+
           if (state is MovieListLoadedStateDeleteSuccess) {
             final deleteSuccessSnackbar = SnackBar(
+                action: SnackBarAction(
+                  label: 'Undo',
+                  onPressed: () {
+                    context
+                        .read<MovieListCubit>()
+                        .restoreMovie(movie: state.deletedMovie);
+                  },
+                ),
                 content: Text('Deleted movie: ${state.deletedMovie.title}'));
             ScaffoldMessenger.of(context).showSnackBar(deleteSuccessSnackbar);
           }

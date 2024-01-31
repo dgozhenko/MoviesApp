@@ -45,3 +45,11 @@ class MovieListLoadedStateDeleteSuccess extends LoadedState {
   @override
   List<Object?> get props => [movies, deletedMovie];
 }
+
+class MovieListLoadedStateUndoDeleteSuccess extends LoadedState {
+  final Movie restoredMovie;
+  MovieListLoadedStateUndoDeleteSuccess(super.movies,
+      {required this.restoredMovie});
+  @override
+  List<Object?> get props => [movies, restoredMovie];
+}
