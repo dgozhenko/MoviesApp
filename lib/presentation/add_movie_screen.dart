@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/data/cubit/add_movie_cubit.dart';
+import 'package:movies_app/domain/entity/movie_entity.dart';
+import 'package:movies_app/domain/enums/add_movie_screen_mode.dart';
 import 'package:movies_app/domain/state/add_movie_state.dart';
 
 class AddMovieScreen extends StatefulWidget {
@@ -15,11 +17,17 @@ class AddMovieScreen extends StatefulWidget {
 class _AddMovieScreenState extends State<AddMovieScreen> {
   final _movieTitleEditingController = TextEditingController();
   var _titleLength = 0;
+  Movie? _movieForEdit;
+  AddMovieScreenMode _addMovieScreenMode = AddMovieScreenMode.create;
 
   @override
   void initState() {
     _movieTitleEditingController.addListener(_updateTitleLength);
+    _movieTitleEditingController.addListener(_checkForEditingChanges);
     context.read<AddMovieCubit>().loadMovieScreen(movieId: widget.movieId);
+    if (widget.movieId != null) {
+      _addMovieScreenMode = AddMovieScreenMode.editDisabled;
+    }
     super.initState();
   }
 
@@ -33,6 +41,36 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
     setState(() {
       _titleLength = _movieTitleEditingController.text.length;
     });
+  }
+
+  void _saveLocalMovie(Movie movie) {
+    setState(() {
+      _movieForEdit = movie;
+    });
+  }
+
+  void _checkForEditingChanges() {
+    if (_movieForEdit != null) {
+      print('Listener triggered');
+      setState(() {
+        if (_movieForEdit!.title == _movieTitleEditingController.text) {
+          _addMovieScreenMode = AddMovieScreenMode.editDisabled;
+        } else {
+          _addMovieScreenMode = AddMovieScreenMode.edit;
+        }
+      });
+    }
+  }
+
+  void _saveMovie() {
+    context
+        .read<AddMovieCubit>()
+        .addMovie(title: _movieTitleEditingController.text);
+  }
+
+  void _editAndSaveMovie(Movie movie) {
+    context.read<AddMovieCubit>().updateMovie(
+        movie: movie, updatedTitle: _movieTitleEditingController.text);
   }
 
   @override
@@ -53,6 +91,7 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
           if (state is LoadedAddMovieState) {
             if (state.movie != null) {
               _movieTitleEditingController.text = state.movie!.title;
+              _saveLocalMovie(state.movie!);
             }
           }
         },
@@ -87,25 +126,25 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
                           return SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                                onPressed: (state is AddMovieInsertLoadingState)
+                                onPressed: (state
+                                            is AddMovieInsertLoadingState) ||
+                                        _addMovieScreenMode ==
+                                            AddMovieScreenMode.editDisabled
                                     ? null
                                     : () {
-                                        if (widget.movieId == null) {
-                                          context.read<AddMovieCubit>().addMovie(
-                                              title:
-                                                  _movieTitleEditingController
-                                                      .text);
-                                        } else {
-                                          final movie =
-                                              (state as LoadedAddMovieState)
-                                                  .movie;
-                                          context
-                                              .read<AddMovieCubit>()
-                                              .updateMovie(
-                                                  movie: movie!,
-                                                  updatedTitle:
-                                                      _movieTitleEditingController
-                                                          .text);
+                                        switch (_addMovieScreenMode) {
+                                          case AddMovieScreenMode.create:
+                                            _saveMovie();
+                                            break;
+                                          case AddMovieScreenMode.edit:
+                                            final movie =
+                                                (state as LoadedAddMovieState)
+                                                    .movie;
+                                            _editAndSaveMovie(movie!);
+                                            break;
+                                          case AddMovieScreenMode.editDisabled:
+                                            null;
+                                            break;
                                         }
                                       },
                                 child: Builder(builder: (context) {
@@ -117,7 +156,13 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
                                             child:
                                                 CircularProgressIndicator()));
                                   }
-                                  return const Text('Create');
+                                  return Text(_addMovieScreenMode ==
+                                          AddMovieScreenMode.create
+                                      ? 'Save'
+                                      : _addMovieScreenMode ==
+                                              AddMovieScreenMode.edit
+                                          ? "Edit and Save"
+                                          : "No changes detected");
                                 })),
                           );
                         },
