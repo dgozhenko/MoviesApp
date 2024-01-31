@@ -17,6 +17,18 @@ class MovieDao {
     return results;
   }
 
+  Future<Movie?> getMovieById(
+      {List<String>? columns, required int movieId}) async {
+    final database = await databaseProvider.database;
+    final databaseMovie = await database.query(movieTable,
+        columns: columns, where: 'id LIKE ?', whereArgs: [movieId]);
+    return databaseMovie.isNotEmpty
+        ? databaseMovie
+            .map((movie) => Movie.fromDatabaseJson(databaseMovie.first))
+            .first
+        : null;
+  }
+
   Future<List<Movie>> getMovies({List<String>? columns, String? query}) async {
     final database = await databaseProvider.database;
     List<Map<String, dynamic>> result = [];

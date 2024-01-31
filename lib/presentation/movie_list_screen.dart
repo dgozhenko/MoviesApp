@@ -25,7 +25,9 @@ class _MovieListScreenState extends State<MovieListScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, AddMovieScreen.routeName).then(
+          Navigator.pushNamed(context, AddMovieScreen.routeName,
+                  arguments: null)
+              .then(
             (value) => context.read<MovieListCubit>().observeAllMovies(),
           );
         },
@@ -95,6 +97,15 @@ class _MovieListScreenState extends State<MovieListScreen> {
                       child: ListTile(
                         title: Text(movies[index].title),
                         subtitle: Text(movies[index].creationTime.toString()),
+                        onTap: () {
+                          Navigator.pushNamed(context, AddMovieScreen.routeName,
+                                  arguments: movies[index].id)
+                              .then(
+                            (value) => context
+                                .read<MovieListCubit>()
+                                .observeAllMovies(),
+                          );
+                        },
                       ),
                     );
                   },

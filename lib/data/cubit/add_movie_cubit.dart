@@ -5,7 +5,30 @@ import 'package:movies_app/domain/state/add_movie_state.dart';
 
 class AddMovieCubit extends Cubit<AddMovieState> {
   late MovieRepository repository;
-  AddMovieCubit({required this.repository}) : super((InitialAddMovieState())) {}
+  AddMovieCubit({required this.repository}) : super((InitialAddMovieState()));
+
+  void loadMovieScreen({required int? movieId}) async {
+    emit(LoadingAddMovieState());
+    if (movieId != null) {
+      await findMovieById(movieId: movieId);
+    } else {
+      emit(LoadedAddMovieState());
+    }
+  }
+
+  Future<void> findMovieById({required int movieId}) async {
+    try {
+      final movie = await repository.getMovieById(movieId);
+      if (movie != null) {
+        emit(LoadedAddMovieState(movie: movie));
+      } else {
+        emit(ErrorAddMovieState(
+            errorMessage: 'There no movie with id: $movieId'));
+      }
+    } catch (e) {
+      emit(ErrorAddMovieState(errorMessage: e.toString()));
+    }
+  }
 
   void addMovie({required String title}) async {
     final movie = Movie(
