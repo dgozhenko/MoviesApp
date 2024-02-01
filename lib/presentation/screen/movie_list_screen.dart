@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/data/cubit/movie_list_cubit.dart';
 import 'package:movies_app/domain/entity/movie_entity.dart';
 import 'package:movies_app/domain/state/movie_list_state.dart';
-import 'package:movies_app/presentation/add_movie_screen.dart';
+import 'package:movies_app/presentation/screen/add_movie_screen.dart';
 import 'package:movies_app/presentation/widget/movie_list_screen/empty_state_screen.dart';
 import 'package:movies_app/presentation/widget/movie_list_screen/movie_list_widget.dart';
 import 'package:movies_app/presentation/widget/snackbars.dart';
