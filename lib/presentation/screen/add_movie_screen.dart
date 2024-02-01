@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/data/cubit/add_movie_cubit.dart';
-import 'package:movies_app/domain/entity/movie_entity.dart';
-import 'package:movies_app/domain/enums/add_movie_screen_mode.dart';
 import 'package:movies_app/domain/state/add_movie_state.dart';
 import 'package:movies_app/presentation/widget/add_movie_screen/loaded_state_widget.dart';
 import 'package:movies_app/presentation/widget/snackbars.dart';
