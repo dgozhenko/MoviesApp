@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/presentation/add_movie_screen.dart';
-import 'package:movies_app/presentation/movie_list_screen.dart';
+import 'package:movies_app/presentation/screen/add_movie_screen.dart';
+import 'package:movies_app/presentation/screen/movie_list_screen.dart';
 
 class AppRouter {
   static Route onGenerateRoute(RouteSettings settings) {
