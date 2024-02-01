@@ -108,7 +108,6 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
 
           if (state is LoadedAddMovieState) {
             if (state.movie != null) {
-              print('MOVIE TITLE: ${state.movie!.title}');
               _movieTitleEditingController.text = state.movie!.title;
               _saveLocalMovie(state.movie!);
             }
@@ -129,6 +128,25 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
                         height: 24,
                       ),
                       TextField(
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (value) {
+                          switch (_addMovieScreenMode) {
+                            case AddMovieScreenMode.save:
+                              _saveMovie();
+                              break;
+                            case AddMovieScreenMode.edit:
+                              final movie = state.movie;
+                              _editAndSaveMovie(movie!);
+                              break;
+                            case AddMovieScreenMode.saveDisabled:
+                            case AddMovieScreenMode.editDisabled:
+                              null;
+                              break;
+                          }
+                        },
+                        onTapOutside: (event) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        },
                         controller: _movieTitleEditingController,
                         decoration: InputDecoration(
                           border: const OutlineInputBorder(),
