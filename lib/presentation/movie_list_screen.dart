@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:movies_app/data/cubit/movie_list_cubit.dart';
 import 'package:movies_app/domain/state/movie_list_state.dart';
 import 'package:movies_app/presentation/add_movie_screen.dart';
+import 'package:movies_app/util/converter/timestamp.dart';
 
 class MovieListScreen extends StatefulWidget {
   const MovieListScreen({super.key});
@@ -80,6 +82,9 @@ class _MovieListScreenState extends State<MovieListScreen> {
                 return ListView.builder(
                   itemCount: movies.length,
                   itemBuilder: (context, index) {
+                    final movie = movies[index];
+                    final date = fromTimestamp(movie.creationTime);
+                    final formattedDate = DateFormat.yMMMMd().format(date);
                     return Dismissible(
                       key: Key(movies[index].id.toString()),
                       onDismissed: (direction) {
@@ -95,8 +100,8 @@ class _MovieListScreenState extends State<MovieListScreen> {
                         ),
                       ),
                       child: ListTile(
-                        title: Text(movies[index].title),
-                        subtitle: Text(movies[index].creationTime.toString()),
+                        title: Text(movie.title),
+                        subtitle: Text(formattedDate),
                         onTap: () {
                           Navigator.pushNamed(context, AddMovieScreen.routeName,
                                   arguments: movies[index].id)
