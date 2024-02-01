@@ -16,3 +16,9 @@ SnackBar buildDeletedMovieSnackbar({
       ),
       content: Text('Deleted movie: ${movie.title}'));
 }
+
+SnackBar buildErrorSnackbar({required String errorMessage}) {
+  return SnackBar(
+    content: Text(errorMessage),
+  );
+}

@@ -1,4 +1,4 @@
-enum AddMovieScreenMode {
+enum AddMovieSaveButtonMode {
   save,
   saveDisabled,
   editDisabled,
