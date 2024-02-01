@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:movies_app/data/cubit/movie_list_cubit.dart';
+import 'package:movies_app/domain/entity/movie_entity.dart';
 import 'package:movies_app/domain/state/movie_list_state.dart';
 import 'package:movies_app/presentation/add_movie_screen.dart';
-import 'package:movies_app/util/converter/timestamp.dart';
+import 'package:movies_app/presentation/widget/movie_list_screen/empty_state_screen.dart';
+import 'package:movies_app/presentation/widget/movie_list_screen/movie_list_widget.dart';
+import 'package:movies_app/presentation/widget/snackbars.dart';
 
 class MovieListScreen extends StatefulWidget {
   const MovieListScreen({super.key});
@@ -22,42 +24,51 @@ class MovieListScreen extends StatefulWidget {
 }
 
 class _MovieListScreenState extends State<MovieListScreen> {
+  void _navigateToAddMovieScreen({required int? movieIdArgument}) {
+    Navigator.pushNamed(context, AddMovieScreen.routeName,
+            arguments: movieIdArgument)
+        .then(
+      (value) => context.read<MovieListCubit>().observeAllMovies(),
+    );
+  }
+
+  void _deleteMovie({required Movie movie}) {
+    context.read<MovieListCubit>().deleteMovie(movie);
+  }
+
+  void _restoreMovie({required Movie movie}) {
+    context.read<MovieListCubit>().restoreMovie(movie: movie);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, AddMovieScreen.routeName,
-                  arguments: null)
-              .then(
-            (value) => context.read<MovieListCubit>().observeAllMovies(),
-          );
+          _navigateToAddMovieScreen(movieIdArgument: null);
         },
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text('Movies'),
+        title: const Text('My Watchlist'),
       ),
       body: BlocListener<MovieListCubit, MovieListState>(
         listener: (context, state) {
           if (state is MovieListLoadedStateUndoDeleteSuccess) {
-            const restoreSuccessSnackbar =
-                SnackBar(content: Text('Successfuly restored movie'));
-            ScaffoldMessenger.of(context).showSnackBar(restoreSuccessSnackbar);
+            ScaffoldMessenger.of(context).showSnackBar(
+              buildRestoreMovieSuccessSnackbar(),
+            );
           }
 
           if (state is MovieListLoadedStateDeleteSuccess) {
-            final deleteSuccessSnackbar = SnackBar(
-                action: SnackBarAction(
-                  label: 'Undo',
-                  onPressed: () {
-                    context
-                        .read<MovieListCubit>()
-                        .restoreMovie(movie: state.deletedMovie);
-                  },
-                ),
-                content: Text('Deleted movie: ${state.deletedMovie.title}'));
-            ScaffoldMessenger.of(context).showSnackBar(deleteSuccessSnackbar);
+            ScaffoldMessenger.of(context).showSnackBar(
+              buildDeletedMovieSnackbar(
+                movie: state.deletedMovie,
+                onUndoPressed: () {
+                  _restoreMovie(movie: state.deletedMovie);
+                },
+              ),
+            );
           }
         },
         child: BlocBuilder<MovieListCubit, MovieListState>(
@@ -77,44 +88,21 @@ class _MovieListScreenState extends State<MovieListScreen> {
             if (state is LoadedState) {
               final movies = state.movies;
               if (movies.isEmpty) {
-                return const Center(child: Text('There no data...'));
+                return EmptyScreenWidget(addMoviePressed: () {
+                  _navigateToAddMovieScreen(movieIdArgument: null);
+                });
               } else {
-                return ListView.builder(
-                  itemCount: movies.length,
-                  itemBuilder: (context, index) {
-                    final movie = movies[index];
-                    final date = fromTimestamp(movie.creationTime);
-                    final formattedDate = DateFormat.yMMMMd().format(date);
-                    return Dismissible(
-                      key: Key(movies[index].id.toString()),
-                      onDismissed: (direction) {
-                        context
-                            .read<MovieListCubit>()
-                            .deleteMovie(movies[index]);
-                      },
-                      background: Container(
-                        color: Colors.red,
-                        child: const Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                        ),
-                      ),
-                      child: ListTile(
-                        title: Text(movie.title),
-                        subtitle: Text(formattedDate),
-                        onTap: () {
-                          Navigator.pushNamed(context, AddMovieScreen.routeName,
-                                  arguments: movies[index].id)
-                              .then(
-                            (value) => context
-                                .read<MovieListCubit>()
-                                .observeAllMovies(),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                );
+                return MovieListWidget(
+                    movies: movies,
+                    onMovieDismissed: ({required direction, required index}) {
+                      // direction for possibility to swip in different direction and mark movie as watched
+                      _deleteMovie(movie: movies[index]);
+                    },
+                    onMovieTap: (index) {
+                      _navigateToAddMovieScreen(
+                        movieIdArgument: movies[index].id!,
+                      );
+                    });
               }
             } else {
               return Container();
