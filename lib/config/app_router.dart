@@ -10,7 +10,11 @@ class AppRouter {
       case MovieListScreen.routeName:
         return MovieListScreen.route();
       case AddMovieScreen.routeName:
-        return AddMovieScreen.route();
+        return MaterialPageRoute(
+            builder: (_) => AddMovieScreen(
+                  movieId: settings.arguments as int?,
+                ),
+            settings: const RouteSettings(name: AddMovieScreen.routeName));
       default:
         return _errorRoute();
     }

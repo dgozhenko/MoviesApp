@@ -4,4 +4,10 @@ abstract class MovieRepository {
   Future<List<Movie>> getMovies();
 
   Future<int> insertMovie(Movie movie);
+
+  Future<int> deleteMovie(int movieId);
+
+  Future<Movie?> getMovieById(int movieId);
+
+  Future<int> updateMovie(Movie movie);
 }
