@@ -1,5 +1,6 @@
 enum AddMovieScreenMode {
-  create,
+  save,
+  saveDisabled,
   editDisabled,
   edit;
 }

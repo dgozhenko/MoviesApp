@@ -18,16 +18,23 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
   final _movieTitleEditingController = TextEditingController();
   var _titleLength = 0;
   Movie? _movieForEdit;
-  AddMovieScreenMode _addMovieScreenMode = AddMovieScreenMode.create;
+  AddMovieScreenMode _addMovieScreenMode = AddMovieScreenMode.saveDisabled;
 
   @override
   void initState() {
     _movieTitleEditingController.addListener(_updateTitleLength);
-    _movieTitleEditingController.addListener(_checkForEditingChanges);
-    context.read<AddMovieCubit>().loadMovieScreen(movieId: widget.movieId);
+
     if (widget.movieId != null) {
       _addMovieScreenMode = AddMovieScreenMode.editDisabled;
     }
+
+    if (widget.movieId == null) {
+      _movieTitleEditingController.addListener(_checkForAbilityToSave);
+    } else {
+      _movieTitleEditingController.addListener(_checkForEditingChanges);
+    }
+    context.read<AddMovieCubit>().loadMovieScreen(movieId: widget.movieId);
+
     super.initState();
   }
 
@@ -35,6 +42,18 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
   void dispose() {
     _movieTitleEditingController.dispose();
     super.dispose();
+  }
+
+  void _checkForAbilityToSave() {
+    if (_movieTitleEditingController.text.replaceAll(' ', '').isNotEmpty) {
+      setState(() {
+        _addMovieScreenMode = AddMovieScreenMode.save;
+      });
+    } else {
+      setState(() {
+        _addMovieScreenMode = AddMovieScreenMode.saveDisabled;
+      });
+    }
   }
 
   void _updateTitleLength() {
@@ -50,14 +69,13 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
   }
 
   void _checkForEditingChanges() {
-    if (_movieForEdit != null) {
-      print('Listener triggered');
+    if (_movieForEdit!.title == _movieTitleEditingController.text) {
       setState(() {
-        if (_movieForEdit!.title == _movieTitleEditingController.text) {
-          _addMovieScreenMode = AddMovieScreenMode.editDisabled;
-        } else {
-          _addMovieScreenMode = AddMovieScreenMode.edit;
-        }
+        _addMovieScreenMode = AddMovieScreenMode.editDisabled;
+      });
+    } else {
+      setState(() {
+        _addMovieScreenMode = AddMovieScreenMode.edit;
       });
     }
   }
@@ -65,12 +83,12 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
   void _saveMovie() {
     context
         .read<AddMovieCubit>()
-        .addMovie(title: _movieTitleEditingController.text);
+        .addMovie(title: _movieTitleEditingController.text.trim());
   }
 
   void _editAndSaveMovie(Movie movie) {
     context.read<AddMovieCubit>().updateMovie(
-        movie: movie, updatedTitle: _movieTitleEditingController.text);
+        movie: movie, updatedTitle: _movieTitleEditingController.text.trim());
   }
 
   @override
@@ -90,6 +108,7 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
 
           if (state is LoadedAddMovieState) {
             if (state.movie != null) {
+              print('MOVIE TITLE: ${state.movie!.title}');
               _movieTitleEditingController.text = state.movie!.title;
               _saveLocalMovie(state.movie!);
             }
@@ -129,11 +148,13 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
                                 onPressed: (state
                                             is AddMovieInsertLoadingState) ||
                                         _addMovieScreenMode ==
-                                            AddMovieScreenMode.editDisabled
+                                            AddMovieScreenMode.editDisabled ||
+                                        _addMovieScreenMode ==
+                                            AddMovieScreenMode.saveDisabled
                                     ? null
                                     : () {
                                         switch (_addMovieScreenMode) {
-                                          case AddMovieScreenMode.create:
+                                          case AddMovieScreenMode.save:
                                             _saveMovie();
                                             break;
                                           case AddMovieScreenMode.edit:
@@ -142,6 +163,7 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
                                                     .movie;
                                             _editAndSaveMovie(movie!);
                                             break;
+                                          case AddMovieScreenMode.saveDisabled:
                                           case AddMovieScreenMode.editDisabled:
                                             null;
                                             break;
@@ -157,7 +179,7 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
                                                 CircularProgressIndicator()));
                                   }
                                   return Text(_addMovieScreenMode ==
-                                          AddMovieScreenMode.create
+                                          AddMovieScreenMode.save
                                       ? 'Save'
                                       : _addMovieScreenMode ==
                                               AddMovieScreenMode.edit
