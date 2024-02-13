@@ -40,6 +40,10 @@ class _MovieListScreenState extends State<MovieListScreen> {
     context.read<MovieListCubit>().restoreMovie(movie: movie);
   }
 
+  void _changeIsWatchedStatus({required Movie movie}) {
+    context.read<MovieListCubit>().changeIsWatchedStatus(updatedMovie: movie);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,9 +98,11 @@ class _MovieListScreenState extends State<MovieListScreen> {
               } else {
                 return MovieListWidget(
                     movies: movies,
-                    onMovieDismissed: ({required direction, required index}) {
-                      // direction for possibility to swip in different direction and mark movie as watched
+                    onDeleteTap: (index) {
                       _deleteMovie(movie: movies[index]);
+                    },
+                    onWatchedTap: (index) {
+                      _changeIsWatchedStatus(movie: movies[index]);
                     },
                     onMovieTap: (index) {
                       _navigateToAddMovieScreen(
