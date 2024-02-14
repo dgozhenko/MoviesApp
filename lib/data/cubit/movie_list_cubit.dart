@@ -19,10 +19,32 @@ class MovieListCubit extends Cubit<MovieListState> {
     }
   }
 
+  void changeIsWatchedStatus({required Movie movie}) async {
+    try {
+      final movies = (state as LoadedState).movies;
+      final updatedMovie = movie.copyWith(isWatched: !movie.isWatched);
+      await repository.updateMovie(updatedMovie);
+      if (movie.isWatched) {
+        final updatedMovies =
+            movies.where((element) => element.id != updatedMovie.id).toList();
+        updatedMovies.insert(0, updatedMovie);
+        emit(MovieListWatchChanged(updatedMovies));
+      } else {
+        final updatedMovies =
+            movies.where((element) => element.id != updatedMovie.id).toList();
+        updatedMovies.add(updatedMovie);
+        emit(MovieListWatchChanged(updatedMovies));
+      }
+    } catch (error) {
+      emit(ErrorState(error.toString()));
+    }
+  }
+
   void deleteMovie(Movie movie) async {
     try {
+      final movies = (state as LoadedState).movies;
       await repository.deleteMovie(movie.id!);
-      final movies = await repository.getMovies();
+      movies.removeWhere((movieItem) => movieItem.id == movie.id);
       emit(MovieListLoadedStateDeleteSuccess(movies, deletedMovie: movie));
     } catch (e) {
       emit(ErrorState(e.toString()));
