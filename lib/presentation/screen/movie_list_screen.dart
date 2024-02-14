@@ -41,7 +41,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
   }
 
   void _changeIsWatchedStatus({required Movie movie}) {
-    context.read<MovieListCubit>().changeIsWatchedStatus(updatedMovie: movie);
+    context.read<MovieListCubit>().changeIsWatchedStatus(movie: movie);
   }
 
   @override
@@ -96,6 +96,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
                   _navigateToAddMovieScreen(movieIdArgument: null);
                 });
               } else {
+                print('State updated ${movies.toString()}');
                 return MovieListWidget(
                     movies: movies,
                     onDeleteTap: (index) {
