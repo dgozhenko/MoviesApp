@@ -96,7 +96,6 @@ class _MovieListScreenState extends State<MovieListScreen> {
                   _navigateToAddMovieScreen(movieIdArgument: null);
                 });
               } else {
-                print('State updated ${movies.toString()}');
                 return MovieListWidget(
                     movies: movies,
                     onDeleteTap: (index) {
