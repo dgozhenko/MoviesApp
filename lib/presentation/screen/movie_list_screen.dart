@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/data/cubit/movie_list_cubit.dart';
 import 'package:movies_app/domain/entity/movie_entity.dart';
+import 'package:movies_app/domain/enums/filtering_option.dart';
 import 'package:movies_app/domain/state/movie_list_state.dart';
 import 'package:movies_app/presentation/screen/add_movie_screen.dart';
+import 'package:movies_app/presentation/widget/movie_list_screen/bottom_dialog/sorting_filtering_bottom_dialog.dart';
 import 'package:movies_app/presentation/widget/movie_list_screen/empty_state_screen.dart';
 import 'package:movies_app/presentation/widget/movie_list_screen/movie_list_widget.dart';
 import 'package:movies_app/presentation/widget/snackbars.dart';
@@ -55,6 +58,17 @@ class _MovieListScreenState extends State<MovieListScreen> {
       ),
       appBar: AppBar(
         title: const Text('My Watchlist'),
+        actions: [
+          IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                    context: context,
+                    builder: (contex) {
+                      return const SortingAndFilteringBottomDialog();
+                    });
+              },
+              icon: const Icon(Icons.filter_alt))
+        ],
       ),
       body: BlocListener<MovieListCubit, MovieListState>(
         listener: (context, state) {
@@ -90,7 +104,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
             }
 
             if (state is LoadedState) {
-              final movies = state.movies;
+              final movies = state.filteredMovies;
               if (movies.isEmpty) {
                 return EmptyScreenWidget(addMoviePressed: () {
                   _navigateToAddMovieScreen(movieIdArgument: null);

@@ -1,0 +1,1 @@
+enum FilteringOption { watched, notWatched }
