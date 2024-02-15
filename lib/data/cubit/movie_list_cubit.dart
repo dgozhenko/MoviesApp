@@ -211,14 +211,17 @@ class MovieListCubit extends Cubit<MovieListState> {
   }
 
   void changeSortingOption({required SortingOption option}) {
-    final movies = (state as LoadedState).movies;
-    final filteredMovies = (state as LoadedState).filteredMovies;
-    final sortingAndFilteringOptions =
-        (state as LoadedState).sortingAndFiltering;
+    final loadedState = state as LoadedState;
+
+    final movies = loadedState.movies;
+    final filteredMovies = loadedState.filteredMovies;
+    final sortingAndFilteringOptions = loadedState.sortingAndFiltering;
+
+    final sortedMovies = sortMovies(movies: filteredMovies, option: option);
     emit(
       LoadedState(
         movies: movies,
-        filteredMovies: filteredMovies,
+        filteredMovies: sortedMovies,
         sortingAndFiltering: sortingAndFilteringOptions.copyWith(
           sorting: sortingAndFilteringOptions.sortingOptions.copyWith(
             option: option,
@@ -229,14 +232,22 @@ class MovieListCubit extends Cubit<MovieListState> {
   }
 
   void changeSortingOrder({required SortingOrder order}) {
-    final movies = (state as LoadedState).movies;
-    final filteredMovies = (state as LoadedState).filteredMovies;
-    final sortingAndFilteringOptions =
-        (state as LoadedState).sortingAndFiltering;
+    final loadedState = state as LoadedState;
+
+    final movies = loadedState.movies;
+    final filteredMovies = loadedState.filteredMovies;
+    final sortingAndFilteringOptions = loadedState.sortingAndFiltering;
+
+    final sortedMovies = sortMovies(
+      movies: filteredMovies,
+      order: order,
+      option: sortingAndFilteringOptions.sortingOptions.sortingOption,
+    );
+
     emit(
       LoadedState(
         movies: movies,
-        filteredMovies: filteredMovies,
+        filteredMovies: sortedMovies,
         sortingAndFiltering: sortingAndFilteringOptions.copyWith(
           sorting: sortingAndFilteringOptions.sortingOptions.copyWith(
             order: order,
@@ -244,5 +255,51 @@ class MovieListCubit extends Cubit<MovieListState> {
         ),
       ),
     );
+  }
+
+  List<Movie> sortMovies({
+    required List<Movie> movies,
+    SortingOption? option,
+    SortingOrder? order,
+  }) {
+    List<Movie> sortedMovies = List.empty();
+    if (order == null) {
+      if (option == SortingOption.byName) {
+        movies.sort(
+          (a, b) {
+            return a.title.compareTo(b.title);
+          },
+        );
+        sortedMovies = movies;
+      } else if (option == SortingOption.byDate) {
+        movies.sort(
+          (a, b) {
+            return a.creationTime.compareTo(b.creationTime);
+          },
+        );
+        sortedMovies = movies;
+      }
+    }
+
+    if (order == SortingOrder.ascending) {
+      sortedMovies = movies
+        ..sort((a, b) {
+          if (option == SortingOption.byName) {
+            return a.title.compareTo(b.title);
+          } else {
+            return a.creationTime.compareTo(b.creationTime);
+          }
+        });
+    } else if (order == SortingOrder.descending) {
+      sortedMovies = movies
+        ..sort((b, a) {
+          if (option == SortingOption.byName) {
+            return a.title.compareTo(b.title);
+          } else {
+            return a.creationTime.compareTo(b.creationTime);
+          }
+        });
+    }
+    return sortedMovies;
   }
 }
