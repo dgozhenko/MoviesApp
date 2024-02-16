@@ -7,6 +7,7 @@ import 'package:movies_app/domain/model/sorting_filtering_model.dart';
 import 'package:movies_app/domain/model/sorting_model.dart';
 import 'package:movies_app/domain/repository/movie_repository.dart';
 import 'package:movies_app/domain/state/movie_list_state.dart';
+import 'package:movies_app/util/extension/list_unique.dart';
 
 class MovieListCubit extends Cubit<MovieListState> {
   late MovieRepository repository;
@@ -152,15 +153,16 @@ class MovieListCubit extends Cubit<MovieListState> {
     final loadedState = state as LoadedState;
 
     final movies = loadedState.movies;
+    final oldFilteredMovies = loadedState.filteredMovies;
     final sortingAndFilteringOptions = loadedState.sortingAndFiltering;
-
+    final isFilterListEmpty =
+        sortingAndFilteringOptions.filteringOptions.isEmpty;
     sortingAndFilteringOptions.filteringOptions.add(option);
 
     final filteredMovies = filterMovies(
       filteringOptions: sortingAndFilteringOptions.filteringOptions,
       movies: movies,
     );
-
     emit(
       LoadedState(
         movies: movies,
@@ -176,6 +178,7 @@ class MovieListCubit extends Cubit<MovieListState> {
     final loadedState = state as LoadedState;
 
     final movies = loadedState.movies;
+    final oldFilteredMovies = loadedState.filteredMovies;
     final sortingAndFilteringOptions = loadedState.sortingAndFiltering;
 
     sortingAndFilteringOptions.filteringOptions.remove(option);
@@ -200,14 +203,17 @@ class MovieListCubit extends Cubit<MovieListState> {
     required List<FilteringOption> filteringOptions,
     required List<Movie> movies,
   }) {
+    List<Movie> filteredMovies = List.empty();
     for (var filter in filteringOptions) {
       if (filter == FilteringOption.watched) {
-        return movies.where((element) => element.isWatched).toList();
+        filteredMovies = filteredMovies +
+            movies.where((element) => element.isWatched).toList();
       } else {
-        return movies.where((element) => !element.isWatched).toList();
+        filteredMovies = filteredMovies +
+            movies.where((element) => !element.isWatched).toList();
       }
     }
-    return movies;
+    return filteringOptions.isEmpty ? movies : filteredMovies;
   }
 
   void changeSortingOption({required SortingOption option}) {

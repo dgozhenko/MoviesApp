@@ -105,6 +105,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
 
             if (state is LoadedState) {
               final movies = state.filteredMovies;
+              final sortingAndFiltering = state.sortingAndFiltering;
               if (movies.isEmpty) {
                 return EmptyScreenWidget(addMoviePressed: () {
                   _navigateToAddMovieScreen(movieIdArgument: null);
@@ -112,6 +113,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
               } else {
                 return MovieListWidget(
                     movies: movies,
+                    sortingAndFilteringModel: sortingAndFiltering,
                     onDeleteTap: (index) {
                       _deleteMovie(movie: movies[index]);
                     },
