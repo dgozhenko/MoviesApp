@@ -41,9 +41,19 @@ class MovieListWidget extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              color: Colors.white,
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 1,
+                    blurRadius: 7,
+                    offset: Offset(0, 1), // changes position of shadow
+                  ),
+                ],
+                color: Colors.white,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
