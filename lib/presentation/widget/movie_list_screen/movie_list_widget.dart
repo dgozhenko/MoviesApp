@@ -1,11 +1,14 @@
 import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:animated_list_plus/transitions.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/data/cubit/movie_list_cubit.dart';
 import 'package:movies_app/domain/entity/movie_entity.dart';
 import 'package:movies_app/domain/enums/filtering_option.dart';
+import 'package:movies_app/domain/enums/sorting_option.dart';
+import 'package:movies_app/domain/enums/sorting_order.dart';
 import 'package:movies_app/domain/model/sorting_filtering_model.dart';
 import 'package:movies_app/presentation/widget/movie_list_screen/movie_list_slidable_item.dart';
 
@@ -37,21 +40,99 @@ class MovieListWidget extends StatelessWidget {
         decoration: const BoxDecoration(color: Color(0xffefefef)),
         child: Column(
           children: [
-            const SizedBox(
-              height: 16,
-            ),
-            Padding(
+            Container(
+              color: Colors.white,
+              width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: sortingAndFilteringModel.filteringOptions
-                    .map((filter) => FilterChip(
-                          label: Text(filter.name),
-                          onSelected: (selected) {},
-                          onDeleted: () {
-                            removeFilteringOption(filter);
-                          },
-                        ))
-                    .toList(),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 4, horizontal: 8),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              color: Colors.grey),
+                          child: const Text(
+                            'Sorted by',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            FilterChip(
+                              label: Text(
+                                sortingAndFilteringModel.sortingOptions
+                                    .sortingOption.nameForSorting,
+                              ),
+                              onSelected: (selected) {},
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            FilterChip(
+                              label: Text(
+                                sortingAndFilteringModel
+                                    .sortingOptions.sortingOrder.nameForSorting,
+                              ),
+                              onSelected: (selected) {},
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                    sortingAndFilteringModel.filteringOptions.isEmpty
+                        ? const Row()
+                        : Row(
+                            children: [
+                              const SizedBox(
+                                  height: 50, child: VerticalDivider()),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4, horizontal: 8),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        color: Colors.grey),
+                                    child: const Text(
+                                      'Filters',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: sortingAndFilteringModel
+                                        .filteringOptions
+                                        .map((filter) => Row(
+                                              children: [
+                                                FilterChip(
+                                                  label: Text(filter.name),
+                                                  onSelected: (selected) {},
+                                                  onDeleted: () {
+                                                    removeFilteringOption(
+                                                        filter);
+                                                  },
+                                                ),
+                                                SizedBox(
+                                                  width: 8,
+                                                )
+                                              ],
+                                            ))
+                                        .toList(),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                  ],
+                ),
               ),
             ),
             const SizedBox(

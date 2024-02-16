@@ -19,17 +19,26 @@ class MovieListCubit extends Cubit<MovieListState> {
     try {
       emit(LoadingState());
       final movies = await repository.getMovies();
+
+      final sortingAndFilteringModel = SortingAndFilteringModel(
+        filteringOptions: [],
+        sortingOptions: SortingModel(
+          sortingOption: SortingOption.byName,
+          sortingOrder: SortingOrder.ascending,
+        ),
+      );
+
+      final sortedMovies = sortMovies(
+        movies: movies,
+        option: sortingAndFilteringModel.sortingOptions.sortingOption,
+        order: sortingAndFilteringModel.sortingOptions.sortingOrder,
+      );
+
       emit(
         LoadedState(
-          movies: movies,
-          filteredMovies: movies,
-          sortingAndFiltering: SortingAndFilteringModel(
-            filteringOptions: [],
-            sortingOptions: SortingModel(
-              sortingOption: SortingOption.byName,
-              sortingOrder: SortingOrder.ascending,
-            ),
-          ),
+          movies: sortedMovies,
+          filteredMovies: sortedMovies,
+          sortingAndFiltering: sortingAndFilteringModel,
         ),
       );
     } catch (error) {
@@ -306,6 +315,6 @@ class MovieListCubit extends Cubit<MovieListState> {
           }
         });
     }
-    return sortedMovies;
+    return sortedMovies.isEmpty ? movies : sortedMovies;
   }
 }
