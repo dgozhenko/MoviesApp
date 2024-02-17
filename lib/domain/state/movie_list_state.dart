@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:movies_app/domain/entity/movie_entity.dart';
+import 'package:movies_app/domain/model/sorting_filtering_model.dart';
 
 abstract class MovieListState extends Equatable {}
 
@@ -24,11 +25,16 @@ class LoadingState extends MovieListState {
 }
 
 class LoadedState extends MovieListState {
-  LoadedState(this.movies);
+  LoadedState(
+      {required this.movies,
+      required this.filteredMovies,
+      required this.sortingAndFiltering});
   final List<Movie> movies;
+  final List<Movie> filteredMovies;
+  final SortingAndFilteringModel sortingAndFiltering;
 
   @override
-  List<Object?> get props => [movies];
+  List<Object?> get props => [movies, sortingAndFiltering];
 }
 
 class ErrorState extends MovieListState {
@@ -40,22 +46,32 @@ class ErrorState extends MovieListState {
 }
 
 class MovieListWatchChanged extends LoadedState {
-  MovieListWatchChanged(super.movies);
+  MovieListWatchChanged(
+      {required super.sortingAndFiltering,
+      required super.movies,
+      required super.filteredMovies});
   @override
-  List<Object?> get props => [movies];
+  List<Object?> get props => [movies, filteredMovies, sortingAndFiltering];
 }
 
 class MovieListLoadedStateDeleteSuccess extends LoadedState {
   final Movie deletedMovie;
-  MovieListLoadedStateDeleteSuccess(super.movies, {required this.deletedMovie});
+  MovieListLoadedStateDeleteSuccess(
+      {required this.deletedMovie,
+      required super.sortingAndFiltering,
+      required super.movies,
+      required super.filteredMovies});
   @override
   List<Object?> get props => [movies, deletedMovie];
 }
 
 class MovieListLoadedStateUndoDeleteSuccess extends LoadedState {
   final Movie restoredMovie;
-  MovieListLoadedStateUndoDeleteSuccess(super.movies,
-      {required this.restoredMovie});
+  MovieListLoadedStateUndoDeleteSuccess(
+      {required this.restoredMovie,
+      required super.sortingAndFiltering,
+      required super.movies,
+      required super.filteredMovies});
   @override
   List<Object?> get props => [movies, restoredMovie];
 }
